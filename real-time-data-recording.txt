@@ -1,0 +1,35 @@
+'This code should go in a regular module sheet, and won't work properly if installed anywhere else. _ 
+    The next (Dim) statement must occur before any subs or functions. 
+Dim NextTime As Double 
+ 
+Sub RecordData() 
+Dim Interval As Double 
+Dim cel As Range, Capture As Range 
+Interval = 5    'Number of seconds between each recording of data 
+Set Capture = Worksheets("Sheet1").Range("A1:A5") 'Capture this column of data 
+With Worksheets("Sheet2")   'Record the data on this worksheet 
+    Set cel = .Range("A2")  'First timestamp goes here 
+    Set cel = .Cells(.Rows.Count, cel.Column).End(xlUp).Offset(1, 0) 
+    cel.Value = Now 
+    cel.Offset(0, 1).Resize(1, Capture.Cells.Count).Value = Application.Transpose(Capture.Value) 
+End With 
+ 
+NextTime = Now + Interval / 86400 
+Application.OnTime NextTime, "RecordData" 
+End Sub 
+ 
+Sub StopRecordingData() 
+On Error Resume Next 
+Application.OnTime NextTime, "RecordData", , False 
+On Error GoTo 0 
+End Sub 
+
+
+'These subs must go in ThisWorkbook code pane. They won't work at all if installed anywhere else! 
+Private Sub Workbook_BeforeClose(Cancel As Boolean) 
+StopRecordingData 
+End Sub 
+ 
+Private Sub Workbook_Open() 
+RecordData 
+End Sub

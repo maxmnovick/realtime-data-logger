@@ -1,0 +1,61 @@
+'''This code must go in a regular Module sheet.'
+
+'The next (Dim) statement must occur before any subs or functions.'
+Dim NextTime As Double
+Dim curVal As Variant, prevVal As Variant
+
+Sub RecordData()
+
+    Dim Interval As Double
+
+    Dim cel As Range, Capture As Range
+
+    Interval = 1 'Number of seconds between each recording of data'
+    
+    Set Capture = Worksheets("Sheet1").Range("A1:D1") 'Capture this column of data'
+    'Dim s As String'
+    's = "Capture: "'
+    'Debug.Print s
+    'Debug.Print s, Capture.Value
+    
+
+
+    With Worksheets("Sheet2") 'Record the data on this worksheet'
+
+        Set cel = .Range("A2") 'First timestamp goes here'
+
+        Set cel = .Cells(.Rows.Count, cel.Column).End(xlUp).Offset(1, 0)
+
+        
+        curVal = Capture.Range("A1").Value
+
+        'Only record value if different from previous value'
+        If curVal <> prevVal Then
+
+            cel.Value = Now
+
+            cel.Offset(0, 1).Resize(1, Capture.Cells.Count).Value = Capture.Value 'Application.Transpose'
+
+        End If
+
+    End With
+
+    NextTime = Now + Interval / 86400
+    Application.OnTime NextTime, "RecordData"
+
+    prevVal = curVal
+
+End Sub
+
+Sub StopRecordingData()
+
+    On Error Resume Next
+
+    Application.OnTime NextTime, "RecordData", , False
+
+    On Error GoTo 0
+
+End Sub
+
+
+

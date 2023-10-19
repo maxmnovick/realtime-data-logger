@@ -1,0 +1,14 @@
+'These subs must go in ThisWorkbook code pane.'
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+
+    StopRecordingData
+
+End Sub
+
+Private Sub Workbook_Open()
+
+    RecordData
+
+End Sub
+
